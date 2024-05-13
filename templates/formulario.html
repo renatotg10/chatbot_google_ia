@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD de Mensagens</title>
+    <!-- Adicionando Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">CRUD de Mensagens</h1>
+
+        <div class="mb-3">
+            <h2>Adicionar/Atualizar Mensagem</h2>
+            <textarea id="nova-mensagem" class="form-control" rows="3"></textarea>
+        </div>
+
+        <div class="mb-3">
+            <button class="btn btn-primary" onclick="criarAtualizarMensagem()">Enviar</button>
+        </div>
+
+        <div class="mb-3" id="conteudo-mensagem">
+            <h2>Mensagem</h2>
+            <p id="mensagem" class="mt-2"></p>
+        </div>
+
+        <div class="mb-3 d-none" id="deletar-mensagem-div">
+            <button class="btn btn-danger" onclick="confirmarDeletarMensagem()">Deletar Mensagem</button>
+        </div>
+    </div>
+
+    <!-- Adicionando Bootstrap JS (opcional, apenas se você precisar de funcionalidades como modals, etc.) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Seu script JavaScript -->
+    <script>
+        window.onload = function() {
+            let mensagem = document.getElementById("mensagem").textContent;
+            if (mensagem) {
+                exibeDelete();
+            }
+        }
+        function exibeDelete() {
+            document.getElementById("deletar-mensagem-div").classList.remove("d-none");
+        }
+
+        function ocultaDelete() {
+            document.getElementById("deletar-mensagem-div").classList.add("d-none");
+        }
+
+
+        function criarAtualizarMensagem() {
+            var novaMensagem = document.getElementById("nova-mensagem").value;
+            fetch('/mensagem', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ "mensagem": novaMensagem })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.mensagem);
+                    obterMensagem(); // Chama a função para atualizar a mensagem exibida
+                });
+        }
+
+        function obterMensagem() {
+            fetch('/mensagem')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("mensagem").innerText = data.mensagem;
+                    // Verifica se há uma mensagem e exibe o botão de deletar se houver
+                    if (data.mensagem !== "Nenhuma mensagem encontrada") {
+                        ocultaDelete();
+                    } else {
+                        exibeDelete();            
+                    }
+                });
+            // Limpa o conteúdo do elemento textarea com id "nova-mensagem"
+            document.getElementById("nova-mensagem").value = "";
+        }
+
+        function confirmarDeletarMensagem() {
+            if (confirm("Tem certeza que deseja deletar a mensagem?")) {
+                deletarMensagem();
+            }
+        }
+
+        function deletarMensagem() {
+            fetch('/mensagem', {
+                method: 'DELETE'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.mensagem);
+                    obterMensagem(); // Chama a função para atualizar a mensagem exibida
+                });
+        }
+
+        // Chama a função para obter a mensagem assim que a página é carregada
+        obterMensagem();
+    </script>
+</body>
+
+</html>
