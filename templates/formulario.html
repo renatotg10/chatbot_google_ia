@@ -37,12 +37,6 @@
 
     <!-- Seu script JavaScript -->
     <script>
-        window.onload = function() {
-            let mensagem = document.getElementById("mensagem").textContent;
-            if (mensagem) {
-                exibeDelete();
-            }
-        }
         function exibeDelete() {
             document.getElementById("deletar-mensagem-div").classList.remove("d-none");
         }
@@ -65,6 +59,7 @@
                 .then(data => {
                     alert(data.mensagem);
                     obterMensagem(); // Chama a função para atualizar a mensagem exibida
+                    exibeDelete();
                 });
         }
 
@@ -74,10 +69,8 @@
                 .then(data => {
                     document.getElementById("mensagem").innerText = data.mensagem;
                     // Verifica se há uma mensagem e exibe o botão de deletar se houver
-                    if (data.mensagem !== "Nenhuma mensagem encontrada") {
-                        ocultaDelete();
-                    } else {
-                        exibeDelete();            
+                    if (data.mensagem) {
+                        exibeDelete();
                     }
                 });
             // Limpa o conteúdo do elemento textarea com id "nova-mensagem"
@@ -99,6 +92,7 @@
                     alert(data.mensagem);
                     obterMensagem(); // Chama a função para atualizar a mensagem exibida
                 });
+                ocultaDelete();
         }
 
         // Chama a função para obter a mensagem assim que a página é carregada
